@@ -12,13 +12,19 @@ Cdiff2 <- Cdiff * Cdiff
 # in the model that dependent variable will be log(coverage)
 
 # 2.descriptive analysis
-stargazer(cover, type = 'text', title = 'Descriptive Analysis')
 
 # 3.VIF
-stargazer(vif(lm(coverage~ Cdiff + Cdiff2 +span + price + payInApp + size + compatibility + contentRank + age + samepubappnum, data=cover)), title = 'VIF test',type = 'text')
+
 # 4.regression
 # 4.1 Model1 control varibles
-Model1 <- lm(coverage ~ span + price + payInApp + size + compatibility + contentRank + age + samepubappnum, data=cover)
+Model1 <- lmer(coverage *100 ~ span + price + payInApp + size + compatibility + contentRank + age + samepubappnum+ (1|lv2id_x), data=cover)
 # 4.2 Model2 baseline model
-Model2 <- lmer(coverage ~ Cdiff + Cdiff2 + span + price + payInApp + size + compatibility + contentRank + age + samepubappnum + (Cdiff | lv2id_x) + (Cdiff2 | lv2id_x) + (1|lv2id_x), data=cover)
+Model2 <- lmer(coverage * 100 ~ Cdiff + Cdiff2 + span + price + payInApp + size + compatibility + contentRank + age + samepubappnum + (Cdiff | lv2id_x) + (Cdiff2 | lv2id_x) + (1|lv2id_x), data=cover)
+# 4.3 Model3 moderation model action_gv
+Model3 <- lmer(coverage *100 ~ Cdiff + Cdiff2 + gv_action + Cdiff*gv_action + Cdiff2*gv_action + span + price + payInApp + size + compatibility + contentRank + age + samepubappnum + (Cdiff | lv2id_x) + (Cdiff2 | lv2id_x) + (1|lv2id_x), data = cover)
+# 4.4 Model4 moderation model c_hetro
+Model4 <- lmer(coverage *100 ~ Cdiff + Cdiff2 + c_hetro + Cdiff*c_hetro + Cdiff2*c_hetro + span + price + payInApp + size + compatibility + contentRank + age + samepubappnum + (Cdiff | lv2id_x) + (Cdiff2 | lv2id_x) + (1|lv2id_x), data = cover)
 # 5.output and graph
+# stargazer(cover, type = 'html', title = 'Descriptive Analysis', out='../../../fig_tables/dod_hlhV1/regression_coverlag1_V1.htm')
+stargazer(vif(lm(coverage * 100~ Cdiff + Cdiff2 +span + price + payInApp + size + compatibility + contentRank + age + samepubappnum, data=cover)), title = 'VIF test',type = 'html', out='../../../fig_tables/dod_hlhV1/vif_cover_V1.htm')
+stargazer(Model1, Model2, Model3, Model4, type= 'html', out='../../../fig_tables/dod_hlhV1/regression_cover_V1.htm')
